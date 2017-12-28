@@ -1,5 +1,8 @@
 const ImagesDAO = require('./private/dao');
 
+const fs = require('fs');
+const probe = require('probe-image-size');
+
 class ImagesService {
   getOneImage (query){
     return new Promise ((resolve, reject) => {
@@ -25,13 +28,32 @@ class ImagesService {
     })
   }
 
-  setImage(query){
+  uploadImage(file, options) {
+    options = options || {};
     return new Promise((resolve, reject) => {
-      return ImagesDAO.insertData(query).then(data =>{
+
+      if (!file || !file.buffer) {
+        return reject('err');
+      }
+      let image = probe.sync(file.buffer);
+      console.log('tatul');
+      if (!image) {
+        return reject('err');
+      }
+
+      let img = {
+        image: file.buffer,
+        content_type: image.content_type,
+        size: file.size,
+        width: image.width,
+        height: image.height
+      }
+console.log('========', img);
+      ImagesDAO.insertData(img).then(data =>{
         resolve(data);
       }).catch(err => {
         reject({
-          err:'error'
+          err: 'error'
         })
       })
     })

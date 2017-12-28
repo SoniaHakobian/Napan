@@ -8,7 +8,7 @@ const ImagesService = require('./service');
 const Utility = require('./../utility/service');
 const AppConstants = require('./../settings/constants');
 const UserValidator = require('./../utility/validators/user-validator');
-const upload = multer({dest: 'resource/'});
+const upload = multer();
 const ET = Utility.ErrorTypes;
 /*function _auth(permission) {
 return function(req,res,next){
@@ -47,6 +47,7 @@ return res.send(err);
 }
 */
 ImagesRouter.get('/', (req,res) => {
+  console.log('get == ');
   ImagesService.getImage({}, req.query.limit, req.query.offset).then(data => {
 
     /*let result = data.map(d =>{
@@ -73,28 +74,29 @@ ImagesRouter.post('/', upload.single('image'),  (req,res) => {
   //   }
   //   res.send("File is uploaded");
   // });
-  //console.log(req.file);
-  if(!req.file) {
-    return res.send(Utility.generateErrorMessage(ET.EMPTY_PHOTO));
-  }
-  if (!req.file.originalname.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG|gif|GIF)$/)) {
-    return res.send(Utility.generateErrorMessage(ET.PHOTO_TYPE_ERROR))
-  }
-  let dimensions = sizeof('{dest}/{filename}'.replace('{dest}', req.file.destination)
-                                             .replace('{filename}', req.file.filename));
+  // if(!req.file) {
+  //   return res.send(Utility.generateErrorMessage(ET.EMPTY_PHOTO));
+  // }
+  // if (!req.file.originalname.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG|gif|GIF)$/)) {
+  //   return res.send(Utility.generateErrorMessage(ET.PHOTO_TYPE_ERROR))
+  // }
+  // let dimensions = sizeof('{dest}/{filename}'.replace('{dest}', req.file.destination)
+  //                                            .replace('{filename}', req.file.filename));
+  //
+  // let image = {
+  //   content_type: req.file.mimetype,
+  //   size: req.file.size,
+  //   title: req.file.filename,
+  //   buffer: req.file.buffer,
+  //   width: dimensions.width,
+  //   height: dimensions.height,
+  // }
 
-  let image = {
-    content_type: req.file.mimetype,
-    size: req.file.size,
-    title: req.file.filename,
-    buffer: req.file.buffer,
-    width: dimensions.width,
-    height: dimensions.height,
-  }
-
-  ImagesService.setImage(image).then(data =>{
+  ImagesService.uploadImage(req.file).then(data =>{
 
     return res.send(data);
+  }).catch(err => {
+    return res.send(err)
   })
 })
 /*
