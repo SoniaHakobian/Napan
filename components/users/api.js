@@ -75,9 +75,7 @@ UsersRouter.put('/:id/', _auth('user'), (req, res) => {
   console.log('update_user == ', update_user);
 
   let options = {
-    requester: req.user,
-    //limit: req.query.limit,
-    //offset: req.query.offset
+    requester: req.user
   };
 
   UsersService.updateUser(id, update_user, options).then(user => {
